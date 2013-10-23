@@ -5,6 +5,7 @@ using System.Text;
 using NetworkCommsDotNet;
 using System.Net;
 using System.Diagnostics;
+using System.Threading;
 
 namespace ServerApplication
 {
@@ -51,13 +52,15 @@ namespace ServerApplication
         /// <param name="message">The message to be printed to the console</param>
         private static void PrintIncomingMessageFast(PacketHeader header, Connection connection, string message)
         {
-            Console.WriteLine("Fast");
+            Console.WriteLine("Fast - " + message );
            // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
 
         private static void PrintIncomingMessageSlow(PacketHeader header, Connection connection, string message)
         {
-            Console.WriteLine("Slow");
+            Console.WriteLine("Slow - " + message );
+            Thread.Sleep(8000);
+            Console.WriteLine("Waking up!");
             // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
     }

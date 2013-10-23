@@ -38,16 +38,17 @@ namespace ClientApplication
             for (int i = 0; i < 500; i++)
                 sb.Append("abcdefghij");
             string ms = sb.ToString();
-
+            string ms2 = "Payload: ";
 
             Console.WriteLine("Testing Network sends");
             int jj = 0;
-            int SendQty = 10;
+            int SendQty = 30;
             for (jj=0;jj<SendQty ;jj++)
             {
                 //Send the message in a single line
-                server.SendObject("Fast", ms,nullCompressionSRO );
-                server.SendObject("Slow",ms,nullCompressionSRO);
+                ms2 = ms2 + jj.ToString();
+                server.SendObject("Fast", ms2,nullCompressionSRO );
+                server.SendObject("Slow",ms2,nullCompressionSRO);
             }
             sw.Stop();
            
