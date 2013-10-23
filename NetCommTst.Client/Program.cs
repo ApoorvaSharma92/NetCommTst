@@ -42,11 +42,12 @@ namespace ClientApplication
 
             Console.WriteLine("Testing Network sends");
             int jj = 0;
-            for (jj=0;jj<100000;jj++)
+            int SendQty = 10;
+            for (jj=0;jj<SendQty ;jj++)
             {
                 //Send the message in a single line
                 server.SendObject("Fast", ms,nullCompressionSRO );
-            
+                server.SendObject("Slow",ms,nullCompressionSRO);
             }
             sw.Stop();
            
