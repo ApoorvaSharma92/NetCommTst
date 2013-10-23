@@ -8,6 +8,9 @@ using NetworkCommsDotNet;
 using System.Net;
 using System.Diagnostics;
 
+using NetCommTst.Common;
+
+
 namespace ClientApplication
 {
     class Program
@@ -24,7 +27,10 @@ namespace ClientApplication
             TCPConnection server = TCPConnection.GetConnection(serverConnectionInfo);
 
             //SendMsgsWithoutReplies(server);
-            SendMsgsWaitingForReplies(server);
+            //SendMsgsWaitingForReplies(server);
+            //SendCustomObjWithTCPReplies(server);
+            SendCustomObjWithReturnObject(server);
+
 
             //We have used comms so we make sure to call shutdown
             NetworkComms.Shutdown();
@@ -133,6 +139,111 @@ namespace ClientApplication
 
             Console.WriteLine("Network test done");
             Console.WriteLine("Time to send " + jj.ToString() + " messages of " + ms.Length + " was: " + sw.Elapsed.ToString() + " seconds");
+            Console.ReadLine();
+        }
+
+        private static void SendCustomObjWithTCPReplies(TCPConnection server)
+        {
+            Console.WriteLine("Sending custom objects and waiting for TCP replies.");
+
+            // Setup Send receive options
+            SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+                        new List<DataProcessor>(),
+                        new Dictionary<string, string>());
+
+            // This is the big change in this routine.
+            // Results in nearly doubling the runtime...makes sense for each packet sent needs to get one back....
+            nullCompressionSRO.ReceiveConfirmationRequired = true;
+
+            // Build Objects
+            MsgSimpleInt msi = new MsgSimpleInt();
+            msi.Number = 1776;
+
+
+            Console.WriteLine("Testing Network sends");
+
+            //================================================================
+            // Start Actual Sending
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            int jj = 0;
+            int SendQty = 100000;
+            try
+            {
+                for (jj = 0; jj < SendQty; jj++)
+                {
+                    server.SendObject("SimpleInt", msi, nullCompressionSRO);
+                    //server.SendObject("RawFast", ms2, nullCompressionSRO);
+                }
+            }
+            catch (CommunicationException ex)
+            {
+            }
+            catch (ConfirmationTimeoutException ex)
+            { }
+            catch (CommsException ex)
+            { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
+            finally { Console.WriteLine("Finally exited"); }
+            sw.Stop();
+
+            Console.WriteLine("Network test done");
+            Console.WriteLine("Time to send " + jj.ToString() + " SimpleInt Objects " + " was: " + sw.Elapsed.ToString() + " seconds");
+            Console.ReadLine();
+        }
+
+        private static void SendCustomObjWithReturnObject(TCPConnection server)
+        {
+            Console.WriteLine("Sending custom objects and waiting for a return objecct!");
+
+            // Setup Send receive options
+            SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+                        new List<DataProcessor>(),
+                        new Dictionary<string, string>());
+
+            // This is the big change in this routine.
+            // Results in nearly doubling the runtime...makes sense for each packet sent needs to get one back....
+            nullCompressionSRO.ReceiveConfirmationRequired = true;
+
+            // Build Objects
+            MsgSimpleInt msi = new MsgSimpleInt();
+            msi.Number = 1776;
+
+            MsgSimpleText mst;
+
+
+            Console.WriteLine("Testing Network sends");
+
+            //================================================================
+            // Start Actual Sending
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+
+            int jj = 0;
+            int SendQty = 10;
+            try
+            {
+                for (jj = 0; jj < SendQty; jj++)
+                {
+                 //   mst = server.SendReceiveObject<MsgSimpleText>(
+                    mst = server.SendReceiveObject<MsgSimpleText>("SimpleIntReturnScenario", "SimpleIntReturnType",2500, msi,nullCompressionSRO,nullCompressionSRO );
+                    Console.WriteLine("Received back the following: " + mst.Text);
+                    //server.SendObject("SimpleInt", msi, nullCompressionSRO);
+
+                }
+            }
+            catch (CommunicationException ex)
+            {
+            }
+            catch (ConfirmationTimeoutException ex)
+            { }
+            catch (CommsException ex)
+            { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
+            finally { Console.WriteLine("Finally exited"); }
+            sw.Stop();
+
+            Console.WriteLine("Network test done");
+            Console.WriteLine("Time to send " + jj.ToString() + " SimpleInt Objects and receive SimpleText objects back was: " + sw.Elapsed.ToString() + " seconds");
             Console.ReadLine();
         }
     }

@@ -7,6 +7,8 @@ using System.Net;
 using System.Diagnostics;
 using System.Threading;
 
+using NetCommTst.Common;
+
 namespace ServerApplication
 {
     class Program
@@ -18,6 +20,8 @@ namespace ServerApplication
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Fast", PrintIncomingMessageFast);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("RawFast", PrintIncomingMessageRawFast);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Slow", PrintIncomingMessageSlow);
+            NetworkComms.AppendGlobalIncomingPacketHandler<MsgSimpleInt>("SimpleInt", HandleSimpleInt);
+            NetworkComms.AppendGlobalIncomingPacketHandler<MsgSimpleInt>("SimpleIntReturnScenario", HandleSimpleIntReturn);
 
             //Start listening for incoming connections
             //TCPConnection.StartListening(true);
@@ -68,6 +72,20 @@ namespace ServerApplication
         private static void PrintIncomingMessageRawFast(PacketHeader header, Connection connection, string message)
         {
         }
- 
+
+        private static void HandleSimpleInt(PacketHeader header, Connection connection, MsgSimpleInt msi)
+        {
+          //  Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString ());
+        }
+
+        private static void HandleSimpleIntReturn(PacketHeader header, Connection connection, MsgSimpleInt msi)
+        {
+            MsgSimpleText mst = new MsgSimpleText();
+            mst.Text = "The value you sent was: " + msi.Number.ToString();
+            Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString() + " sending a SimpleText Object back");
+            connection.SendObject("SimpleIntReturnType", mst);
+
+        }
+
     }
 }
