@@ -16,6 +16,7 @@ namespace ServerApplication
             //Trigger the method PrintIncomingMessage when a packet of type 'Message' is received
             //We expect the incoming object to be a string which we state explicitly by using <string>
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Fast", PrintIncomingMessageFast);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>("RawFast", PrintIncomingMessageRawFast);
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Slow", PrintIncomingMessageSlow);
 
             //Start listening for incoming connections
@@ -63,5 +64,10 @@ namespace ServerApplication
             Console.WriteLine("Waking up!");
             // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
+
+        private static void PrintIncomingMessageRawFast(PacketHeader header, Connection connection, string message)
+        {
+        }
+ 
     }
 }
