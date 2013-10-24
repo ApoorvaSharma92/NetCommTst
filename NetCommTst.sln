@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCommTst.Server", "NetCom
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCommTst.Common", "NetCommTst.Common\NetCommTst.Common.csproj", "{5F16CBDF-AAA2-4255-85A6-33FFE11C4DCB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCommTst.ServerRPC", "NetCommTst.ServerRPC\NetCommTst.ServerRPC.csproj", "{87AAD7EA-5800-4431-A23B-D2B429EA00B7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -25,6 +27,10 @@ Global
 		{5F16CBDF-AAA2-4255-85A6-33FFE11C4DCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F16CBDF-AAA2-4255-85A6-33FFE11C4DCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5F16CBDF-AAA2-4255-85A6-33FFE11C4DCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87AAD7EA-5800-4431-A23B-D2B429EA00B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87AAD7EA-5800-4431-A23B-D2B429EA00B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87AAD7EA-5800-4431-A23B-D2B429EA00B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87AAD7EA-5800-4431-A23B-D2B429EA00B7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

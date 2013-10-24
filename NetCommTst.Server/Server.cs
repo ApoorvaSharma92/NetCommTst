@@ -49,6 +49,7 @@ namespace ServerApplication
             NetworkComms.Shutdown();
         }
 
+        #region MsgHandlers
         /// <summary>
         /// Writes the provided message to the console window
         /// </summary>
@@ -61,6 +62,13 @@ namespace ServerApplication
            // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
 
+
+        /// <summary>
+        /// Receiver for the Slow message test case.  Sleeps for 8 seconds and then wakes up
+        /// </summary>
+        /// <param name="header"></param>
+        /// <param name="connection"></param>
+        /// <param name="message"></param>
         private static void PrintIncomingMessageSlow(PacketHeader header, Connection connection, string message)
         {
             Console.WriteLine("Slow - " + message );
@@ -69,15 +77,29 @@ namespace ServerApplication
             // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
 
+        /// <summary>
+        /// Receiver for the RawFast test routines
+        /// </summary>
+        /// <param name="header"></param>
+        /// <param name="connection"></param>
+        /// <param name="message"></param>
         private static void PrintIncomingMessageRawFast(PacketHeader header, Connection connection, string message)
         {
         }
 
+        /// <summary>
+        ///Accepts a SimpleInt object.  Does nothing with it, purely a performance test routine 
+        /// </summary>
+        /// <param name="header"></param>
+        /// <param name="connection"></param>
+        /// <param name="msi">SimpleInt object</param>
         private static void HandleSimpleInt(PacketHeader header, Connection connection, MsgSimpleInt msi)
         {
           //  Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString ());
         }
 
+
+        // Accepts a SimpleInt object and sends back to the calling program a SimpleText object.
         private static void HandleSimpleIntReturn(PacketHeader header, Connection connection, MsgSimpleInt msi)
         {
             MsgSimpleText mst = new MsgSimpleText();
@@ -86,6 +108,6 @@ namespace ServerApplication
             connection.SendObject("SimpleIntReturnType", mst);
 
         }
-
+        #endregion
     }
 }
