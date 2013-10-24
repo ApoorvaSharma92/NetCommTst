@@ -21,7 +21,7 @@ namespace ClientApplication
             ConnectionInfo serverConnectionInfo;
 
             // Define destination address            
-            IPEndPoint IPE = IPTools.ParseEndPointFromString("10.1.53.44:19404");
+            IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19404");
             serverConnectionInfo = new ConnectionInfo(IPE);
 
             TCPConnection server = TCPConnection.GetConnection(serverConnectionInfo);
@@ -225,10 +225,14 @@ namespace ClientApplication
             {
                 for (jj = 0; jj < SendQty; jj++)
                 {
-                 //   mst = server.SendReceiveObject<MsgSimpleText>(
+                    // The following command does the following:
+                    //  -- Send a MsgSimpleInt object to server (4th parameter)
+                    //  -- Sends the server the message SimpleIntReturnScenario - This sends the message to the correct handler on server.
+                    //  -- Tells server to return it back in the SimpleIntReturnType message.
+                    //  -- timeout after 2500 seconds.
+                    //  -- Sends transport options - including serialization protocol.
                     mst = server.SendReceiveObject<MsgSimpleText>("SimpleIntReturnScenario", "SimpleIntReturnType",2500, msi,nullCompressionSRO,nullCompressionSRO );
                     Console.WriteLine("Received back the following: " + mst.Text);
-                    //server.SendObject("SimpleInt", msi, nullCompressionSRO);
 
                 }
             }

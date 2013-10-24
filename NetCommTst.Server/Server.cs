@@ -30,7 +30,7 @@ namespace ServerApplication
             //ConnectionInfo serverConnectionInfo;
 
             // Define destination address            
-            IPEndPoint IPE = IPTools.ParseEndPointFromString("10.1.53.44:19404");
+            IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19404");
             //serverConnectionInfo = new ConnectionInfo(IPE);
 
             TCPConnection.StartListening(IPE);
@@ -102,11 +102,11 @@ namespace ServerApplication
         // Accepts a SimpleInt object and sends back to the calling program a SimpleText object.
         private static void HandleSimpleIntReturn(PacketHeader header, Connection connection, MsgSimpleInt msi)
         {
+            //Thread.Sleep(4000);   // Test timeout situation.
             MsgSimpleText mst = new MsgSimpleText();
             mst.Text = "The value you sent was: " + msi.Number.ToString();
             Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString() + " sending a SimpleText Object back");
             connection.SendObject("SimpleIntReturnType", mst);
-
         }
         #endregion
     }
