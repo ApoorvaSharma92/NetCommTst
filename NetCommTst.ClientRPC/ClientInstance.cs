@@ -29,11 +29,17 @@ namespace NetCommTst.ClientRPC
             Console.WriteLine("RPC instance has been created with instanceID: " + instanceID);
 
             // Now play with the 8 ball.
-            while (true)
+            //while (true)
             {
                 // Send RPC commands.
                 Console.WriteLine ("Resetting result was: " +  remoteObj.Reset());
                 Console.WriteLine ("Will I win the Lottery? Answer: " + remoteObj.AskQuestion ("Will I win the lottery?"));
+                Console.WriteLine("Result of shaking: " + remoteObj.Shake().ToString());
+                Console.WriteLine("Complain at the 8 ball: " + remoteObj.Complain("You cheat!"));
+                MsgSimpleInt msi = new MsgSimpleInt();
+                msi.Number = 1776;
+                MsgSimpleText mst = remoteObj.AskComplexNumberQuestion(msi);
+                Console.WriteLine("Just asked the 8 ball a complex question.  The answer was: " + mst.Text);
             }
 
         }
