@@ -7,6 +7,8 @@ using System.Threading.Tasks;
 using ProtoBuf;
 using NetCommTst.Common;
 using NetworkCommsDotNet;
+using DPSBase;
+
 using System.Net;
 using System.Diagnostics;
 
@@ -24,14 +26,16 @@ namespace NetCommTst.ClientRPC
             IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19504");
             ConnectionInfo CI = new ConnectionInfo(IPE);
 
-            Connection connection = TCPConnection.GetConnection(CI);
+
+            SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+                        new List<DataProcessor>(),
+                        new Dictionary<string, string>());
+
+
+            Connection connection = TCPConnection.GetConnection(CI,nullCompressionSRO );
             string instanceID = "";
 
             // Not used at moment - not sure can use...
-
-            //SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
-              //          new List<DataProcessor>(),
-                //        new Dictionary<string, string>());
 
             // Establish RPC connection with Server
             IMagicEightBall remoteObj = SelectRemoteObject(connection, out instanceID);
@@ -65,7 +69,8 @@ namespace NetCommTst.ClientRPC
                 mst2 = remoteObj.AskComplexNumberQuestion(msi2);
             }
             sw.Stop();
-            double rate = (SendQty / sw.ElapsedMilliseconds) * 1000;
+            double qty = SendQty;
+            double rate = (qty / sw.ElapsedMilliseconds) * 1000;
             Console.WriteLine("Just sent " + SendQty.ToString() + " rpc calls to server in " + sw.Elapsed.ToString() + " seconds.  A rate of " + rate.ToString());
             Console.ReadLine();
         }

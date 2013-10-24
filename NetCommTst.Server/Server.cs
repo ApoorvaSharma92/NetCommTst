@@ -7,12 +7,16 @@ using System.Net;
 using System.Diagnostics;
 using System.Threading;
 
+using DPSBase;
+using System.Configuration;
 using NetCommTst.Common;
 
 namespace ServerApplication
 {
     class Program
     {
+        static SendReceiveOptions ProtoOnly = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(), null, null);
+
         static void Main(string[] args)
         {
             //Trigger the method PrintIncomingMessage when a packet of type 'Message' is received
@@ -29,8 +33,10 @@ namespace ServerApplication
             NetworkComms.PacketConfirmationTimeoutMS = 20000;
             //ConnectionInfo serverConnectionInfo;
 
-            // Define destination address            
-            IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19404");
+            // Define destination address         
+            string ip = ConfigurationSettings.AppSettings["IP_Address"];
+            string Port = ConfigurationSettings.AppSettings["Port"];
+            IPEndPoint IPE = IPTools.ParseEndPointFromString(ip + ":" + Port);
             //serverConnectionInfo = new ConnectionInfo(IPE);
 
             TCPConnection.StartListening(IPE);
@@ -58,7 +64,7 @@ namespace ServerApplication
         /// <param name="message">The message to be printed to the console</param>
         private static void PrintIncomingMessageFast(PacketHeader header, Connection connection, string message)
         {
-            Console.WriteLine("Fast - " + message );
+          //  Console.WriteLine("Fast - " + message );
            // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
         }
 
@@ -71,7 +77,7 @@ namespace ServerApplication
         /// <param name="message"></param>
         private static void PrintIncomingMessageSlow(PacketHeader header, Connection connection, string message)
         {
-            Console.WriteLine("Slow - " + message );
+            Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " is going to slow queue..." + message);
             Thread.Sleep(8000);
             Console.WriteLine("Waking up!");
             // Console.WriteLine("\nA message was recieved from " + connection.ToString() + " which said '" + message + "'.");
@@ -95,6 +101,7 @@ namespace ServerApplication
         /// <param name="msi">SimpleInt object</param>
         private static void HandleSimpleInt(PacketHeader header, Connection connection, MsgSimpleInt msi)
         {
+            Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " was just processed");
           //  Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString ());
         }
 
@@ -106,7 +113,7 @@ namespace ServerApplication
             MsgSimpleText mst = new MsgSimpleText();
             mst.Text = "The value you sent was: " + msi.Number.ToString();
             Console.WriteLine("SimpleInt Value was: " + msi.Number.ToString() + " sending a SimpleText Object back");
-            connection.SendObject("SimpleIntReturnType", mst);
+            connection.SendObject("SimpleIntReturnType", mst,ProtoOnly );
         }
         #endregion
     }
