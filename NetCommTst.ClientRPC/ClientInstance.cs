@@ -8,6 +8,7 @@ using ProtoBuf;
 using NetCommTst.Common;
 using NetworkCommsDotNet;
 using System.Net;
+using System.Diagnostics;
 
 namespace NetCommTst.ClientRPC
 {
@@ -25,6 +26,14 @@ namespace NetCommTst.ClientRPC
 
             Connection connection = TCPConnection.GetConnection(CI);
             string instanceID = "";
+
+            // Not used at moment - not sure can use...
+
+            //SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+              //          new List<DataProcessor>(),
+                //        new Dictionary<string, string>());
+
+            // Establish RPC connection with Server
             IMagicEightBall remoteObj = SelectRemoteObject(connection, out instanceID);
             Console.WriteLine("RPC instance has been created with instanceID: " + instanceID);
 
@@ -42,6 +51,23 @@ namespace NetCommTst.ClientRPC
                 Console.WriteLine("Just asked the 8 ball a complex question.  The answer was: " + mst.Text);
             }
 
+            // Load Testing - do a bunch of RPC calls.
+            Console.WriteLine("Now preparing to loadtest RPC calls...");
+            Stopwatch sw = new Stopwatch();
+            MsgSimpleText  mst2 = new MsgSimpleText();
+            MsgSimpleInt msi2 = new MsgSimpleInt();
+            msi2.Number = 1776;
+
+            int SendQty = 300;
+            sw.Start();
+            for (int jj = 0; jj < SendQty; jj++)
+            {
+                mst2 = remoteObj.AskComplexNumberQuestion(msi2);
+            }
+            sw.Stop();
+            double rate = (SendQty / sw.ElapsedMilliseconds) * 1000;
+            Console.WriteLine("Just sent " + SendQty.ToString() + " rpc calls to server in " + sw.Elapsed.ToString() + " seconds.  A rate of " + rate.ToString());
+            Console.ReadLine();
         }
 
         private IMagicEightBall SelectRemoteObject(Connection connection, out string instanceID)
