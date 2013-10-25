@@ -26,14 +26,14 @@ namespace NetCommTst.ClientRPC
             IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19504");
             ConnectionInfo CI = new ConnectionInfo(IPE);
             
-
-
+            NetworkComms.PacketConfirmationTimeoutMS = 20000;
             SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
                         new List<DataProcessor>(),
                         new Dictionary<string, string>());
 
 
             Connection connection = TCPConnection.GetConnection(CI,nullCompressionSRO );
+            NetworkComms.DisableConnectionSendTimeouts = true;
             string instanceID = "";
 
             // Not used at moment - not sure can use...

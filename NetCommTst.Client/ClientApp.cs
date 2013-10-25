@@ -17,6 +17,17 @@ namespace ClientApplication
     {
         static void Main(string[] args)
         {
+            #region Setup
+
+            // Speed up transactions 40x.  
+            SendReceiveOptions ProtoBufSerialize_Only = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+                        new List<DataProcessor>(),
+                        new Dictionary<string, string>());
+            // Probably want this set to true always.
+            ProtoBufSerialize_Only.ReceiveConfirmationRequired = true;
+            NetworkComms.DefaultSendReceiveOptions = ProtoBufSerialize_Only;
+
+
             NetworkComms.PacketConfirmationTimeoutMS = 20000;
             ConnectionInfo serverConnectionInfo;
 
@@ -26,11 +37,18 @@ namespace ClientApplication
 
             TCPConnection server = TCPConnection.GetConnection(serverConnectionInfo);
 
+            #endregion
             int SendQty = 10000;
-            SendMsgsWithoutReplies(server,SendQty );
-            SendMsgsWaitingForReplies(server,SendQty );
+
+            // Uncomment the test you wish to run.
+
+            //SendMsgsWaitingForReplies(server,SendQty );
+            //SendMsgsNoWaitingForReplies(server,SendQty );
             //SendCustomObjWithTCPReplies(server,SendQty );
-            SendCustomObjWithReturnObject(server,SendQty  );
+            //SendCustomObjWithReturnObject(server,SendQty  );
+
+            // Real world load testing.
+            LoadTestRandomCalls(server );
 
             Console.WriteLine("Press return to exit client.");
             Console.ReadLine();
@@ -39,15 +57,13 @@ namespace ClientApplication
             NetworkComms.Shutdown();
         }
 
-        private static void SendMsgsWithoutReplies(TCPConnection server, int Qty)
+        private static void SendMsgsWaitingForReplies(TCPConnection server, int Qty)
         {
-            Console.WriteLine("Sending messages without waiting for replies - Send as Fast As Possible.");
-            // Setup Send receive options
-            SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
-                        new List<DataProcessor>(),
-                        new Dictionary<string, string>());
-
-
+            Console.WriteLine("Sending messages waiting for replies");
+            // Setup Send receive options - We now set it up as app default.  See main routine.
+            //SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
+            //            new List<DataProcessor>(),
+            //            new Dictionary<string, string>());
 
             StringBuilder sb = new StringBuilder("Start");
 
@@ -73,7 +89,10 @@ namespace ClientApplication
                 {
                     //Send the message in a single line
                     ms2 = ms2 + jj.ToString();
-                    server.SendObject("Fast", ms2, nullCompressionSRO);
+                    server.SendObject("Fast", ms2);
+                    // Below was necessary before we setup no compression and encryption at app default level.  Shows how you can override on a 
+                    // per call basis.
+                    //server.SendObject("Fast", ms2, nullCompressionSRO);
                     //server.SendObject("Slow", ms2, nullCompressionSRO);
 
                 }
@@ -81,14 +100,10 @@ namespace ClientApplication
                 double qty = SendQty;
                 rate = qty / sw.ElapsedMilliseconds * 1000;
                 Console.WriteLine("Network test done");
-                Console.WriteLine("Time to send " + jj.ToString() + " Fast messages without replies was: " + sw.Elapsed.ToString() + " seconds.  Rate = " + rate.ToString() + " msgs/sec");
+                Console.WriteLine("Time to send " + jj.ToString() + " Fast messages waiting for replies was: " + sw.Elapsed.ToString() + " seconds.  Rate = " + rate.ToString() + " msgs/sec");
             
             }
-            catch (CommunicationException ex)
-            {
-            }
-            catch (ConfirmationTimeoutException ex)
-            { }
+
             catch (CommsException ex)
             { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
             finally { Console.WriteLine("Finally exited"); }
@@ -99,17 +114,17 @@ namespace ClientApplication
         }
 
 
-        private static void SendMsgsWaitingForReplies(TCPConnection server, int qty)
+        private static void SendMsgsNoWaitingForReplies(TCPConnection server, int qty)
         {
-            Console.WriteLine("Sending messages waiting for replies.");
+            Console.WriteLine("Sending messages NOT waiting for TCP/IP replies.  - Send as Fast As Possible.");
 
             // Setup Send receive options
             SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
                         new List<DataProcessor>(),
                         new Dictionary<string, string>());
 
-            // This is the big change in this routine.
-            nullCompressionSRO.ReceiveConfirmationRequired = true;
+            // This is the big change in this routine. 
+            nullCompressionSRO.ReceiveConfirmationRequired = false ;
 
             StringBuilder sb = new StringBuilder("Start");
 
@@ -137,9 +152,12 @@ namespace ClientApplication
             }
             catch (CommunicationException ex)
             {
+                Console.WriteLine(ex.InnerException.ToString());
             }
             catch (ConfirmationTimeoutException ex)
-            { }
+            {
+                Console.WriteLine(ex.InnerException.ToString());
+            }
             catch (CommsException ex)
             { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
             finally { Console.WriteLine("Finally exited"); }
@@ -149,7 +167,7 @@ namespace ClientApplication
             double qty2 = SendQty;
             rate = qty2 / sw.ElapsedMilliseconds * 1000;
             Console.WriteLine("Network test done");
-            Console.WriteLine("Time to send " + jj.ToString() + " RawFast Objects and receive a TCPIP Reply was: " + sw.Elapsed.ToString() + " seconds.  Rate = " + rate.ToString() + " msgs/sec");
+            Console.WriteLine("Time to send " + jj.ToString() + " RawFast Objects with no TCPIP Reply Wait was: " + sw.Elapsed.ToString() + " seconds.  Rate = " + rate.ToString() + " msgs/sec");
             
         }
 
@@ -188,11 +206,7 @@ namespace ClientApplication
                     //server.SendObject("RawFast", ms2, nullCompressionSRO);
                 }
             }
-            catch (CommunicationException ex)
-            {
-            }
-            catch (ConfirmationTimeoutException ex)
-            { }
+   
             catch (CommsException ex)
             { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
             finally { Console.WriteLine("Finally exited"); }
@@ -255,14 +269,16 @@ namespace ClientApplication
             }
             catch (CommunicationException ex)
             {
-                int r;
-                r = 1;
+                Console.WriteLine(ex.InnerException.ToString());
             }
             catch (ConfirmationTimeoutException ex)
-            { int r; r=0; }
+            {
+                Console.WriteLine(ex.InnerException.ToString());
+            }
             catch (CommsException ex)
             { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
             finally { Console.WriteLine("Finally exited"); }
+
             sw.Stop();
 
             double rate;
@@ -271,6 +287,141 @@ namespace ClientApplication
             Console.WriteLine("Network test done");
             Console.WriteLine("Time to send " + jj.ToString() + " SimpleInt Objects and receive SimpleText objects back was: " + sw.Elapsed.ToString() + " seconds.  Rate = " + rate.ToString () + " msgs/sec");
             
+        }
+
+        static void LoadTestRandomCalls(TCPConnection server)
+        {
+            #region StartupCode
+            Console.WriteLine("Load Test with Random calls.");
+
+            // Setup Send receive options
+            //SendReceiveOptions ProtoOnly = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(), null, null);
+            //NetworkComms.DefaultSendReceiveOptions = ProtoOnly;
+
+            // This is the big change in this routine.
+            // Results in nearly doubling the runtime...makes sense for each packet sent needs to get one back....
+            //nullCompressionSRO.ReceiveConfirmationRequired = true;
+            //ProtoOnly.ReceiveConfirmationRequired = true;
+
+            
+            // Build Objects we will be using.
+            MsgSimpleInt msi = new MsgSimpleInt();
+            MsgSimpleText mst = new MsgSimpleText();
+            msi.Number = 0;
+
+            Console.WriteLine("Starting Test Now.");
+
+            //================================================================
+            // Start Actual Sending
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
+            #endregion
+
+
+            // Setup some variables
+            double SendDbl = 576434.34;
+            string SendStr = "Some text is being sent";
+            MsgReallyComplexA mrca = new MsgReallyComplexA();
+            mrca.Year = 2456;
+            mrca.msi = new MsgSimpleInt();
+            mrca.msi.Number = 660099;
+            mrca.mca = new MSgComplexA();
+            mrca.mca.Text = "Hi";
+            mrca.mca.Number = -56;
+
+            int jj = 0;
+            int kk = 0;
+            int ll = 0;
+            long ld = 0;
+            long vld = 0;
+
+            long c1 = 0;
+            long c2 = 0;
+            long c3 = 0;
+            long c4 = 0;
+            long c5 = 0;
+            long c6 = 0;
+
+            Random rand = new Random();
+            int val;
+
+            int ReportingInterval = 1000;
+            int SendQty = ReportingInterval * 1000000; 
+            try
+            {
+                for (jj = 0; jj < SendQty; jj++)
+                {
+                    Stopwatch sw2 = new Stopwatch();
+                    sw2.Start();
+                    for (kk = 0; kk < ReportingInterval; kk++)
+                    {
+                        val = rand.Next(1, 7);
+                        switch (val)
+                        {
+                            case 1:
+                                c1++;
+                                server.SendObject("LoadTstInt", val);
+                                break;
+                            case 2:
+                                c2++;
+                                server.SendObject("LoadTstDouble", SendDbl);
+                                break;
+                            case 3:
+                                c3++;
+                                // Send a string and accept a bool back.
+                                bool rc = server.SendReceiveObject<bool>("LoadTstString", "RCBool", 5000, SendStr);
+                              //  Console.WriteLine("Received " + rc.ToString());
+                                //server.SendObject("LoadTstString", SendStr);
+                                break;
+                            case 4:
+                                c4++;
+                                server.SendObject("LoadTstMRCA", mrca);
+                                break;
+                            case 5:
+                                c5++;
+                                server.SendObject("LoadTstLongDelay", val);
+                                ld++;
+                                break;
+                            case 6:
+                                c6++;
+                                server.SendObject("LoadTstVeryLongDelay", val);
+                                vld++;
+                                break;
+                        }
+                        //mst = server.SendReceiveObject<MsgSimpleText>("SimpleIntReturnScenario", "SimpleIntReturnType", 2500, msi, ProtoOnly, ProtoOnly); //, nullCompressionSRO, nullCompressionSRO);
+                        //Console.WriteLine("Received back the following: " + mst.Text);
+                    } // for kk
+                    sw2.Stop();
+
+                    Console.WriteLine("Just processed " + kk.ToString() + " records in " + sw2.Elapsed.ToString() + " seconds");
+                    Console.WriteLine("c1: " + c1.ToString());
+                    Console.WriteLine("c2: " + c2.ToString());
+                    Console.WriteLine("c3: " + c3.ToString());
+                    Console.WriteLine("c4: " + c4.ToString());
+                    Console.WriteLine("c5: " + c5.ToString());
+                    Console.WriteLine("c6: " + c6.ToString());
+                    c6 = c5 = c4 = c3 = c2 = c1 = 0;
+                } // for jj
+            }
+            catch (CommunicationException ex)
+            {
+                Console.WriteLine(ex.InnerException.ToString());
+            }
+            catch (ConfirmationTimeoutException ex)
+            {
+                Console.WriteLine(ex.InnerException.ToString());
+            }
+            catch (CommsException ex)
+            { Console.WriteLine("Bad stuff just happened - " + ex.ToString()); }
+            finally { Console.WriteLine("Finally exited"); }
+
+            sw.Stop();
+
+            Console.WriteLine("Sent: " + jj.ToString() + " * " + kk.ToString() + " objects to server.");
+            Console.WriteLine("This took: " + sw.Elapsed.ToString() + " time to execute");
+            Console.WriteLine("We incurred " + ld.ToString() + " long delays and " + vld.ToString() + " very long delays during this time.");
+            Console.WriteLine("Network test done");
+           
         }
     }
 }

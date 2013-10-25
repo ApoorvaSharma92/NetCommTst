@@ -26,21 +26,27 @@ namespace ServerApplication
             NetworkComms.AppendGlobalIncomingPacketHandler<string>("Slow", PrintIncomingMessageSlow);
             NetworkComms.AppendGlobalIncomingPacketHandler<MsgSimpleInt>("SimpleInt", HandleSimpleInt);
             NetworkComms.AppendGlobalIncomingPacketHandler<MsgSimpleInt>("SimpleIntReturnScenario", HandleSimpleIntReturn);
+            NetworkComms.AppendGlobalIncomingPacketHandler<int>("LoadTstInt", HandleLoadTst_Int);
+            NetworkComms.AppendGlobalIncomingPacketHandler<double>("LoadTstDouble", HandleLoadTst_Double);
+            NetworkComms.AppendGlobalIncomingPacketHandler<string>("LoadTstString", HandleLoadTst_String);
+            NetworkComms.AppendGlobalIncomingPacketHandler<MsgReallyComplexA>("LoadTstMRCA", HandleLoadTst_MsgReallyComplex);
+            NetworkComms.AppendGlobalIncomingPacketHandler<int>("LoadTstLongDelay", HandleLoadTst_LongDelay);
+            NetworkComms.AppendGlobalIncomingPacketHandler<int>("LoadTstVeryLongDelay", HandleLoadTst_VeryLongDelay);    
 
-            //Start listening for incoming connections
-            //TCPConnection.StartListening(true);
+            // Set engine defaults
+
+            // Setup Send receive options
+            SendReceiveOptions ProtoOnly = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(), null, null);
+            NetworkComms.DefaultSendReceiveOptions = ProtoOnly;
 
             NetworkComms.PacketConfirmationTimeoutMS = 20000;
-            //ConnectionInfo serverConnectionInfo;
 
             // Define destination address         
             string ip = ConfigurationSettings.AppSettings["IP_Address"];
             string Port = ConfigurationSettings.AppSettings["Port"];
             IPEndPoint IPE = IPTools.ParseEndPointFromString(ip + ":" + Port);
-            //serverConnectionInfo = new ConnectionInfo(IPE);
 
             TCPConnection.StartListening(IPE);
-            //TCPConnection.GetConnection(serverConnectionInfo);
             
 
             //Print out the IPs and ports we are now listening on
@@ -116,5 +122,39 @@ namespace ServerApplication
             connection.SendObject("SimpleIntReturnType", mst,ProtoOnly );
         }
         #endregion
+
+#region LoadTestHandlers
+        private static void HandleLoadTst_Int(PacketHeader header, Connection connection, int value)
+        {
+            value = value * 12;
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " was just processed: " + value.ToString() );
+        }
+        private static void HandleLoadTst_Double(PacketHeader header, Connection connection, double value)
+        {
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + ".  Double Value was: " + value.ToString());
+        }
+        private static void HandleLoadTst_String(PacketHeader header, Connection connection, string value)
+        {          
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " sent us a string - " + value);
+          //  Thread.Sleep(2000);
+            connection.SendObject("RCBool", true, ProtoOnly);
+        }
+        private static void HandleLoadTst_MsgReallyComplex(PacketHeader header, Connection connection, MsgReallyComplexA mrca)
+        {
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " sent us a complex object with year value of: " + mrca.Year.ToString());
+        }
+        private static void HandleLoadTst_LongDelay(PacketHeader header, Connection connection, int value)
+        {
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " zzzzzz");
+            Thread.Sleep(3000);
+            //Console.WriteLine("Awake!!");
+        }
+        private static void HandleLoadTst_VeryLongDelay(PacketHeader header, Connection connection, int value)
+        {
+                // Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.");
+                 Thread.Sleep(15000);
+              //   Console.WriteLine("Woke up from long sleep");
+        }
+#endregion
     }
 }

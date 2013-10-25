@@ -27,8 +27,6 @@ namespace NetCommTst.ServerRPC
 
             if (cxn == ConnectionType.TCP)
                 foreach (System.Net.IPEndPoint localEndPoint in TCPConnection.ExistingLocalListenEndPoints()) Console.WriteLine("{0}:{1}", localEndPoint.Address, localEndPoint.Port);
-           
-
         }
 
         private void SetConnectionType()
@@ -42,7 +40,7 @@ namespace NetCommTst.ServerRPC
             // RPC transactions (Round trips) went from 43 / second to 1500/second.  
             SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),null,null);
             NetworkComms.DefaultSendReceiveOptions = nullCompressionSRO;
-            
+            NetworkComms.PacketConfirmationTimeoutMS = 20000;           
  
         }
 
