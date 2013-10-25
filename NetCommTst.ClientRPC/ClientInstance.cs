@@ -25,6 +25,7 @@ namespace NetCommTst.ClientRPC
             cxn = ConnectionType.TCP;
             IPEndPoint IPE = IPTools.ParseEndPointFromString("127.0.0.1:19504");
             ConnectionInfo CI = new ConnectionInfo(IPE);
+            
 
 
             SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),
@@ -62,7 +63,7 @@ namespace NetCommTst.ClientRPC
             MsgSimpleInt msi2 = new MsgSimpleInt();
             msi2.Number = 1776;
 
-            int SendQty = 300;
+            int SendQty = 30000;
             sw.Start();
             for (int jj = 0; jj < SendQty; jj++)
             {

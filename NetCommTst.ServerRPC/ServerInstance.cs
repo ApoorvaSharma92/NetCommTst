@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using ProtoBuf;
+using DPSBase;
 using NetCommTst.Common;
 using NetworkCommsDotNet;
 using System.Net;
@@ -27,13 +28,21 @@ namespace NetCommTst.ServerRPC
             if (cxn == ConnectionType.TCP)
                 foreach (System.Net.IPEndPoint localEndPoint in TCPConnection.ExistingLocalListenEndPoints()) Console.WriteLine("{0}:{1}", localEndPoint.Address, localEndPoint.Port);
            
-           
+
         }
 
         private void SetConnectionType()
         {
             Console.WriteLine("Starting a TCP connection");
             cxn  = ConnectionType.TCP;
+
+            // Set application wide default for Send Receive Options (Serializer, encryption engine, compression engine)
+            // We are setting it here to use Protocol Buffers as serialization engine and no compression or encryption engines.
+            // Turning compression / encryption on results in a 95% reduction in throughput.  For instance on our test machine
+            // RPC transactions (Round trips) went from 43 / second to 1500/second.  
+            SendReceiveOptions nullCompressionSRO = new SendReceiveOptions(DPSManager.GetDataSerializer<ProtobufSerializer>(),null,null);
+            NetworkComms.DefaultSendReceiveOptions = nullCompressionSRO;
+            
  
         }
 
