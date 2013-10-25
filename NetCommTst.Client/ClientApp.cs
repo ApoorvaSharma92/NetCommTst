@@ -345,7 +345,7 @@ namespace ClientApplication
             Random rand = new Random();
             int val;
 
-            int ReportingInterval = 1000;
+            int ReportingInterval = 10000;
             int SendQty = ReportingInterval * 1000000; 
             try
             {
@@ -355,7 +355,9 @@ namespace ClientApplication
                     sw2.Start();
                     for (kk = 0; kk < ReportingInterval; kk++)
                     {
-                        val = rand.Next(1, 7);
+                        // Change the max value to 7 to run the sleeping threads server functions.
+                        // Change to 5 to run normal routines.
+                        val = rand.Next(1, 5);
                         switch (val)
                         {
                             case 1:
@@ -363,8 +365,11 @@ namespace ClientApplication
                                 server.SendObject("LoadTstInt", val);
                                 break;
                             case 2:
+                                // Send a double and get an integer back!
                                 c2++;
-                                server.SendObject("LoadTstDouble", SendDbl);
+                                int rcint = server.SendReceiveObject<int>("LoadTstDouble", "RCBool", 4000, SendDbl);
+                                //Console.WriteLine("Sent a double and got an Int back! = " + rcint.ToString());
+                                //server.SendObject("LoadTstDouble", SendDbl);
                                 break;
                             case 3:
                                 c3++;

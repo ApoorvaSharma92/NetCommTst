@@ -32,17 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DPSBase">
-      <HintPath>..\..\..\DemosAndTrials\NetworkComms\DPSBase\bin\Debug\DPSBase.dll</HintPath>
-    </Reference>
-    <Reference Include="NetworkCommsDotNet">
-      <HintPath>..\..\..\DemosAndTrials\NetworkComms\Platforms\Net40\NetworkCommsDotNet\bin\Debug\NetworkCommsDotNet.dll</HintPath>
-    </Reference>
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\..\DemosAndTrials\NetworkComms\DLL\Net40\protobuf-net.dll</HintPath>
-    </Reference>
-    <Reference Include="RemoteProcedureCalls">
-      <HintPath>..\..\..\DemosAndTrials\NetworkComms\RemoteProcedureCalls\bin\Debug\RemoteProcedureCalls.dll</HintPath>
+    <Reference Include="NetworkCommsDotNetComplete">
+      <HintPath>..\..\..\CompiledLibraries\NetWorkComms\NetworkCommsDotNetComplete.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

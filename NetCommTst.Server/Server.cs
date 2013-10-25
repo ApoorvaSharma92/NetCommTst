@@ -129,16 +129,7 @@ namespace ServerApplication
             value = value * 12;
             //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " was just processed: " + value.ToString() );
         }
-        private static void HandleLoadTst_Double(PacketHeader header, Connection connection, double value)
-        {
-            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + ".  Double Value was: " + value.ToString());
-        }
-        private static void HandleLoadTst_String(PacketHeader header, Connection connection, string value)
-        {          
-            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " sent us a string - " + value);
-          //  Thread.Sleep(2000);
-            connection.SendObject("RCBool", true, ProtoOnly);
-        }
+
         private static void HandleLoadTst_MsgReallyComplex(PacketHeader header, Connection connection, MsgReallyComplexA mrca)
         {
             //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " sent us a complex object with year value of: " + mrca.Year.ToString());
@@ -151,10 +142,30 @@ namespace ServerApplication
         }
         private static void HandleLoadTst_VeryLongDelay(PacketHeader header, Connection connection, int value)
         {
-                // Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.");
-                 Thread.Sleep(15000);
-              //   Console.WriteLine("Woke up from long sleep");
+            // Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz.");
+            Thread.Sleep(15000);
+            //   Console.WriteLine("Woke up from long sleep");
         }
+
+        #region LoadTestSendRecvHandlers
+        private static void HandleLoadTst_Double(PacketHeader header, Connection connection, double value)
+        {
+            int r = 0;
+            r = (int)value;
+                        
+            connection.SendObject("RCBool", r, ProtoOnly);
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + ".  Double Value was: " + value.ToString());
+        }
+        private static void HandleLoadTst_String(PacketHeader header, Connection connection, string value)
+        {          
+            //Console.WriteLine("Connection from: " + connection.ConnectionInfo.RemoteEndPoint.ToString() + " sent us a string - " + value);
+          //  Thread.Sleep(2000);
+            connection.SendObject("RCBool", true, ProtoOnly);
+        }
+        #endregion
+
+
+ 
 #endregion
     }
 }
