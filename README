@@ -13,8 +13,8 @@ But, even in their present state they should be really easy to figure out.
 Right now I have messaging and RPC working.  The examples that come with 
 the project work well, but are incredibly difficult to see what
 is going on as they are combined into one program and have tons of 
-extra "garbage" that take away from the real simplicity of getting this
+extra stuff that take away from the real simplicity of getting this
 library up and working.  Once you know what you are doing they are 
 sufficient, but for first time practice and proof of concept and 
-learning they are terrible.  Hopefully others will find these 
-useful and learn to like this application.
+learning they are more difficult than they need to be.  Therefore these are
+simpler and just what is needed to get the core code working and how it works.
