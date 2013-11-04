@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="NetworkCommsDotNetComplete">
       <HintPath>..\..\..\CompiledLibraries\NetWorkComms\NetworkCommsDotNetComplete.dll</HintPath>
+    </Reference>      
     <Reference Include="DPSBase, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\Temp\networkcomms\MarcF-networkcomms.net-ff6cb62ee1c2\Platforms\Net40\DPSBase\bin\Debug\DPSBase.dll</HintPath>
