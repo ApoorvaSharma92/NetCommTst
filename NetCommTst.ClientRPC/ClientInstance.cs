@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ProtoBuf;
 using NetCommTst.Common;
 using NetworkCommsDotNet;
+using RemoteProcedureCalls;
 using DPSBase;
 
 using System.Net;
@@ -36,7 +37,6 @@ namespace NetCommTst.ClientRPC
             NetworkComms.DisableConnectionSendTimeouts = true;
             string instanceID = "";
 
-            // Not used at moment - not sure can use...
 
             // Establish RPC connection with Server
             IMagicEightBall remoteObj = SelectRemoteObject(connection, out instanceID);
@@ -50,10 +50,20 @@ namespace NetCommTst.ClientRPC
                 Console.WriteLine ("Will I win the Lottery? Answer: " + remoteObj.AskQuestion ("Will I win the lottery?"));
                 Console.WriteLine("Result of shaking: " + remoteObj.Shake().ToString());
                 Console.WriteLine("Complain at the 8 ball: " + remoteObj.Complain("You cheat!"));
+
+                
+                // This demonstrates how to change the RPC timeout for the next call and then reset back.
+                IRPCProxy yyyy = (IRPCProxy)remoteObj;
+                yyyy.RPCTimeout = 3500;
+
+                
                 MsgSimpleInt msi = new MsgSimpleInt();
                 msi.Number = 1776;
                 MsgSimpleText mst = remoteObj.AskComplexNumberQuestion(msi);
                 Console.WriteLine("Just asked the 8 ball a complex question.  The answer was: " + mst.Text);
+
+                // Reset proxy timeout to 10s.
+                yyyy.RPCTimeout = 10000;
             }
 
             // Load Testing - do a bunch of RPC calls.
@@ -82,7 +92,19 @@ namespace NetCommTst.ClientRPC
 
             // Private Client Object Instance
             Console.WriteLine("Creating a Private Client Object Instance ");
-            return RemoteProcedureCalls.Client.CreateProxyToPrivateInstance<IMagicEightBall>(connection,instanceNamed,out instanceID);
+
+            IMagicEightBall x;
+            IRPCProxy y;
+
+            // Get the Proxy object so we can set some default values for all connections on this proxy.
+            y = (IRPCProxy)Client.CreateProxyToPrivateInstance<IMagicEightBall>(connection, instanceNamed, out instanceID);
+            x = RemoteProcedureCalls.Client.CreateProxyToPrivateInstance<IMagicEightBall>(connection,instanceNamed,out instanceID);
+
+            // Set RPC timeout to 10s.
+            y.RPCTimeout = 10000;
+
+            // Return the RPC interface.
+            return ((IMagicEightBall)y);
         }
 
     }

@@ -34,6 +34,20 @@
   <ItemGroup>
     <Reference Include="NetworkCommsDotNetComplete">
       <HintPath>..\..\..\CompiledLibraries\NetWorkComms\NetworkCommsDotNetComplete.dll</HintPath>
+    <Reference Include="DPSBase, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Temp\networkcomms\MarcF-networkcomms.net-ff6cb62ee1c2\Platforms\Net40\DPSBase\bin\Debug\DPSBase.dll</HintPath>
+    </Reference>
+    <Reference Include="NetworkCommsDotNet, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Temp\networkcomms\MarcF-networkcomms.net-ff6cb62ee1c2\Platforms\Net40\NetworkCommsDotNet\bin\Debug\NetworkCommsDotNet.dll</HintPath>
+    </Reference>
+    <Reference Include="protobuf-net">
+      <HintPath>..\..\..\DemosAndTrials\NetworkComms\DLL\Net40\protobuf-net.dll</HintPath>
+    </Reference>
+    <Reference Include="RemoteProcedureCalls, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Temp\networkcomms\MarcF-networkcomms.net-ff6cb62ee1c2\RemoteProcedureCalls\bin\Debug\RemoteProcedureCalls.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
